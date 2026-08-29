@@ -1,5 +1,8 @@
 # Hugo rental site template
 
+[![Build pages](https://github.com/filmil/hugo-rental-template/actions/workflows/build-pages.yaml/badge.svg)](https://github.com/filmil/hugo-rental-template/actions/workflows/build-pages.yaml)
+[![Test a pull request](https://github.com/filmil/hugo-rental-template/actions/workflows/test-pages.yaml/badge.svg)](https://github.com/filmil/hugo-rental-template/actions/workflows/test-pages.yaml)
+
 A Bazel-built Hugo marketing and blog site for a short-term-rental
 business. It is paired with a separate external booking engine that this
 repository does not build; the marketing site links out to it.
