@@ -13,6 +13,15 @@ The rendered site is meant to be served from a host of your choice
 tokens described in "How to make it yours" below.
 
 
+## Live demo
+
+CI builds this repository and deploys the rendered site to a separate
+results repository, [filmil/hugo-rental-template-site](https://github.com/filmil/hugo-rental-template-site),
+on every push to `main`. That repo holds the generated HTML only; point
+`external_repository` in `.github/workflows/build-pages.yaml` at your own
+deploy target to make it yours.
+
+
 ## Building
 
 The site is built by Bazel. Nothing needs to be installed on the machine
