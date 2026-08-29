@@ -95,3 +95,28 @@ to catch breakage before merge.
 5. Edit `data/*.yaml` to describe your own properties and listings.
 6. Write real content under `content/`.
 7. Replace the placeholder legal pages (privacy, terms) with your own.
+
+
+## Contributing
+
+This template began as the engine behind one specific vacation-rental site.
+It no longer tracks that site.
+It now stands on its own as a general-purpose starting point that anyone can
+use, so contributions are welcome and wanted.
+
+If you build something with it, or find a rough edge, please open an issue or
+a pull request:
+
+- Bug reports and fixes.
+- Improvements to the theme, the build, or the docs.
+- New reusable examples, as long as they stay generic and carry no
+  brand-specific content.
+
+A few practical notes:
+
+- Keep the template brand-neutral.
+  Real names, domains, keys, and photos belong in a fork, not here.
+- Make sure `bazel build //:site` passes before you open a pull request.
+- Keep each pull request focused on a single change.
+
+The project is Apache-2.0 licensed, so your contributions are too.
