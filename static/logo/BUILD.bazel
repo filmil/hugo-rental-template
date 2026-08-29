@@ -1,0 +1,85 @@
+# SPDX-License-Identifier: Apache-2.0
+load("//bazel:tikz.bzl", "tikz_svg")
+
+# This package sits under static/ on purpose. rules_hugo stages generated
+# inputs at their own output path, and hugo's source root is the package
+# output directory -- so a file generated here lands at static/logo/ inside
+# the staged tree and is published at /logo/. Because this directory is its
+# own Bazel package, the site's glob(["static/**"]) cannot reach into it,
+# so the .tex sources, the BUILD file and the tracer are never published;
+# only the generated SVGs are, via the labels in //:site's static attribute.
+#
+# Ink follows the booking site: pure black on light surfaces, white on
+# dark ones. The scheme stylesheet matters because the SVG is referenced
+# from <img> and as a favicon, where currentColor cannot see the page.
+tikz_svg(
+    name = "brand-logo",
+    src = "brand-logo.tex",
+    dark_ink = "#ffffff",
+    light_ink = "#000000",
+    scheme_style = True,
+    texlive = "@texlive_bundle//:files",
+    visibility = ["//visibility:public"],
+)
+
+# The favicon companion: the two-cats mark without the wordmark, which
+# reads as noise at 16 px.
+tikz_svg(
+    name = "brand-mark",
+    src = "brand-mark.tex",
+    dark_ink = "#ffffff",
+    light_ink = "#000000",
+    scheme_style = True,
+    texlive = "@texlive_bundle//:files",
+    visibility = ["//visibility:public"],
+)
+
+# Fixed-ink companions: always black, in either colour scheme. For contexts
+# where following the viewer's scheme is wrong -- print, uploads to systems
+# that composite the mark themselves (a booking engine's logo slot, say), or placement on
+# a surface known to be light. Same sources; only the embedded stylesheet
+# differs, pinning both schemes' ink to black.
+tikz_svg(
+    name = "brand-logo-black",
+    src = "brand-logo.tex",
+    dark_ink = "#000000",
+    light_ink = "#000000",
+    scheme_style = True,
+    texlive = "@texlive_bundle//:files",
+    visibility = ["//visibility:public"],
+)
+
+tikz_svg(
+    name = "brand-mark-black",
+    src = "brand-mark.tex",
+    dark_ink = "#000000",
+    light_ink = "#000000",
+    scheme_style = True,
+    texlive = "@texlive_bundle//:files",
+    visibility = ["//visibility:public"],
+)
+
+# Fixed-white companion for surfaces that are dark in every scheme: the
+# site footer is black regardless of the viewer's colour scheme, so
+# scheme-following ink would go black-on-black for light-mode visitors.
+tikz_svg(
+    name = "brand-logo-white",
+    src = "brand-logo.tex",
+    dark_ink = "#ffffff",
+    light_ink = "#ffffff",
+    scheme_style = True,
+    texlive = "@texlive_bundle//:files",
+    visibility = ["//visibility:public"],
+)
+
+# Fixed-white mark for the black footer, the small-size companion to
+# brand-logo-white.
+tikz_svg(
+    name = "brand-mark-white",
+    src = "brand-mark.tex",
+    dark_ink = "#ffffff",
+    light_ink = "#ffffff",
+    scheme_style = True,
+    texlive = "@texlive_bundle//:files",
+    visibility = ["//visibility:public"],
+)

@@ -1,0 +1,14 @@
+# This is a git-vendor config file.
+# For details see https://github.com/thejoshwolfe/git-vendor/blob/main/README.md#reference
+
+dir=third_party/git-vendor/src
+url=git@github.com:thejoshwolfe/git-vendor
+follow-branch=main
+commit=0f609d1a17331475390cceb47a07269719ad2180
+
+---
+
+dir=third_party/rentaltheme
+url=git@github.com:YOURORG/hugo-rentaltheme.git
+follow-branch=main
+commit=718902b78348791df277f8562456196736169814

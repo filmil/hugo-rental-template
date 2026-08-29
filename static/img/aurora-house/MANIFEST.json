@@ -1,0 +1,59 @@
+{
+ "purpose": "Placeholder images for the template. Replace each with your own or a liberally-licensed photo, and record its source + license below. Captions in the pages render these credit lines.",
+ "images": [
+  {
+   "file": "card.jpg",
+   "size": "1200x800",
+   "author": "REPLACE ME",
+   "license": "CC BY 4.0",
+   "license_url": "https://creativecommons.org/licenses/by/4.0/",
+   "source": "https://example.com/replace-me",
+   "credit_line": "Photo: Photographer Name, CC BY 4.0, via Source"
+  },
+  {
+   "file": "house-winter.jpg",
+   "size": "1200x800",
+   "author": "REPLACE ME",
+   "license": "CC BY 4.0",
+   "license_url": "https://creativecommons.org/licenses/by/4.0/",
+   "source": "https://example.com/replace-me",
+   "credit_line": "Photo: Photographer Name, CC BY 4.0, via Source"
+  },
+  {
+   "file": "living-room.jpg",
+   "size": "1200x800",
+   "author": "REPLACE ME",
+   "license": "CC BY 4.0",
+   "license_url": "https://creativecommons.org/licenses/by/4.0/",
+   "source": "https://example.com/replace-me",
+   "credit_line": "Photo: Photographer Name, CC BY 4.0, via Source"
+  },
+  {
+   "file": "kitchen.jpg",
+   "size": "1200x800",
+   "author": "REPLACE ME",
+   "license": "CC BY 4.0",
+   "license_url": "https://creativecommons.org/licenses/by/4.0/",
+   "source": "https://example.com/replace-me",
+   "credit_line": "Photo: Photographer Name, CC BY 4.0, via Source"
+  },
+  {
+   "file": "bedroom.jpg",
+   "size": "1200x800",
+   "author": "REPLACE ME",
+   "license": "CC BY 4.0",
+   "license_url": "https://creativecommons.org/licenses/by/4.0/",
+   "source": "https://example.com/replace-me",
+   "credit_line": "Photo: Photographer Name, CC BY 4.0, via Source"
+  },
+  {
+   "file": "sauna.jpg",
+   "size": "1200x800",
+   "author": "REPLACE ME",
+   "license": "CC BY 4.0",
+   "license_url": "https://creativecommons.org/licenses/by/4.0/",
+   "source": "https://example.com/replace-me",
+   "credit_line": "Photo: Photographer Name, CC BY 4.0, via Source"
+  }
+ ]
+}

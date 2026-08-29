@@ -1,0 +1,18 @@
+<footer class="site-footer">
+  <div class="container foot-row">
+    <a class="brand brand-foot" href="{{ "/" | relURL }}">
+      {{ $flogo := .Site.Params.footerLogo | default .Site.Params.logo }}
+      {{ with $flogo }}<img src="{{ . | relURL }}" alt="{{ $.Site.Title }}">{{ end }}
+      {{ if .Site.Params.brandTextA }}<span class="brand-word"><span class="b1">{{ .Site.Params.brandTextA }}</span>{{ .Site.Params.brandTextB }}</span>{{ else if not $flogo }}<span class="brand-text">{{ .Site.Title }}</span>{{ end }}
+    </a>
+    <nav class="foot-nav">
+      {{ range .Site.Menus.footer }}<a href="{{ .URL | relURL }}">{{ .Name }}</a>{{ end }}
+      {{ with .Site.Params.cookieLink }}<a href="{{ . }}">Cookie Preferences</a>{{ end }}
+    </nav>
+  </div>
+  <div class="container foot-legal">
+    {{ if templates.Exists "partials/foot_custom.html" }}{{ partial "foot_custom.html" . }}{{ end }}
+    {{ with .Site.Params.footer }}<div>{{ replace . "{Year}" now.Year | markdownify }}</div>{{ end }}
+    <p class="fineprint">&copy; {{ now.Year }} {{ .Site.Params.copyright | default .Site.Title }}. All rights reserved.</p>
+  </div>
+</footer>

@@ -1,0 +1,12 @@
+# Add your local user settings to file `user.bazelrc`
+try-import %workspace%/user.bazelrc
+
+# rules_hugo and texlive_bundle are served from a community Bazel registry
+# (not yet in the Bazel Central Registry). Keep this line, or point it at
+# your own mirror of those modules. Adding a custom registry drops the BCR
+# default, so BCR is added back explicitly on the next line.
+common --registry=https://raw.githubusercontent.com/filmil/bazel-registry/main
+common --registry=https://bcr.bazel.build
+
+# Clearer diagnostics when the hugo action fails.
+build --verbose_failures

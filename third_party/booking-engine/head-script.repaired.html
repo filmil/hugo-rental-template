@@ -1,0 +1,27 @@
+<!-- PLACEHOLDER: the "repaired" head script -- the version you would paste
+     back into your booking engine's Head script field. It shows the same
+     three parts as head-script.original.html, cleaned up.
+
+     Booking engines that render with styled-components emit class names that
+     rotate on each deployment, so target stable element/component selectors
+     (or your own ids) rather than the rotating hashes. Replace this with your
+     own repaired export. -->
+
+<!-- 1. Custom CSS -- keyed to stable selectors, not rotating hashes. -->
+<style>
+  /* Link hover. */
+  a:hover { color: #4d88fe !important; }
+
+  /* Buttons: rounded corners. */
+  #booking-widget button { border-radius: 10px !important; }
+
+  /* Header/footer content clamped to the content width. */
+  .booking-container { max-width: 76.5rem !important; margin: 0 auto !important; }
+</style>
+
+<!-- 2. Analytics / tag manager. -->
+<!-- PLACEHOLDER: analytics tag, e.g. gtag with id G-XXXXXXXXXX. -->
+<script>/* window.dataLayer = ... ; gtag('config', 'G-XXXXXXXXXX'); */</script>
+
+<!-- 3. Cookie-consent / CMP loader. -->
+<!-- PLACEHOLDER: consent-manager loader from https://cdn.yourdomain.com/consent.js -->

@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: Apache-2.0
+"""yourdomain.com -- the Hugo site, built with Bazel via rules_hugo.
+
+`bazel build //:site` renders the whole site into bazel-bin/site, byte for
+byte what `hugo` produces in public/. The hugo binary is pinned and
+downloaded by the `hugo` module extension, so nothing needs to be installed
+on the machine.
+"""
+
+module(
+    name = "yourdomain_com",
+    version = "0.1.0",
+)
+
+# Published in the custom registry (see .bazelrc): stackb/rules_hugo at
+# 294a8ec62, overlaid with bzlmod support and patched for Bazel 9.
+bazel_dep(name = "rules_hugo", version = "0.1.0")
+
+# The same hugo the CI used before the Bazel migration: 0.91.2 extended.
+hugo = use_extension("@rules_hugo//hugo:extensions.bzl", "hugo")
+hugo.download(
+    extended = True,
+    sha256 = "e9e2b35ebef6ed41581eb18909b8ee02ee9285d209f7d9ecc5caf5207b7dc8e5",
+    version = "0.91.2",
+)
+use_repo(hugo, "hugo")
+
+# The logo in //static/logo is rendered from traced TikZ sources by
+# //bazel:tikz.bzl. The bundle is a complete, pre-built TeX tree pinned by
+# checksum, so nothing is installed on the machine and nothing is fetched
+# from CTAN at build time.
+bazel_dep(name = "texlive_bundle", version = "1.1.1")
+
+bazel_dep(name = "buildifier_prebuilt", version = "8.5.1.3", dev_dependency = True)

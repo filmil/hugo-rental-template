@@ -1,0 +1,12 @@
+[Unit]
+Description=Run the rental site article generator monthly (T.10)
+
+[Timer]
+# First of the month, 06:30 UTC. Offset from the site's rebuild schedule so a
+# batch never lands mid-deploy. Persistent catches up a missed run after
+# downtime.
+OnCalendar=*-*-01 06:30:00 UTC
+Persistent=true
+
+[Install]
+WantedBy=timers.target

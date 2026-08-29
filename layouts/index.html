@@ -1,0 +1,119 @@
+{{ define "main" }}
+{{/* The landing page: a hero with your booking engine's search widget, the
+     destinations from data/destinations.yaml, the homes from data/homes.yaml,
+     the latest journal posts, and an optional social strip from
+     data/creators.yaml. Styles live in the theme's theme.css. Replace
+     /img/hero.jpg with your own hero image. */}}
+<section class="hero" style="background-image:url('{{ "/img/hero.jpg" | relURL }}')">
+  <div class="hero-inner">
+    <h1>{{ .Site.Title }}</h1>
+    <p class="hero-sub">Book your next vacation with us directly and save</p>
+    <div class="hero-search">
+      <div id="booking-widget"></div>
+    </div>
+  </div>
+</section>
+
+<section class="land">
+  <div class="container">
+    <p class="eyebrow">Destinations</p>
+    <h2>Three places we call home</h2>
+    <div class="dest-grid">
+      {{ range .Site.Data.destinations }}
+      <a class="dest-card" href="{{ .href }}">
+        <span class="dest-imgbox">
+          <img src="{{ .image }}" alt="{{ .name }}" loading="lazy">
+          <span class="dest-tags">{{ range .tags }}<span class="tag">{{ . }}</span>{{ end }}</span>
+        </span>
+        <span class="dest-title">{{ .name }}</span>
+        <span class="dest-meta">{{ .meta }}</span>
+      </a>
+      {{ end }}
+    </div>
+  </div>
+</section>
+
+<section class="land">
+  <div class="container">
+    <p class="eyebrow">Our homes</p>
+    <h2>Three homes, three destinations</h2>
+    <div class="homes-grid">
+      {{ range .Site.Data.homes }}
+      <a class="home-tile" href="{{ .page }}">
+        <span class="m-img"><img src="{{ .img }}" alt="{{ .name }}" loading="lazy"></span>
+        <span class="t">{{ .name }}</span>
+        <span class="s">{{ .specs }}</span>
+      </a>
+      {{ end }}
+    </div>
+  </div>
+</section>
+
+<section class="land alt">
+  <div class="container">
+    <p class="eyebrow">Browse by</p>
+    <div class="facet-row">
+      <a href="/pet-friendly/">Pet friendly</a>
+      <a href="/hot-tub/">Hot tub</a>
+    </div>
+  </div>
+</section>
+
+{{ $posts := where .Site.RegularPages "Section" "post" }}
+{{ if gt (len $posts) 0 }}
+<section class="land alt">
+  <div class="container">
+    <p class="eyebrow">From the journal</p>
+    <h2>Plan a better trip</h2>
+    <div class="post-grid">
+      {{ range first 3 $posts }}
+      <a class="post-tile" href="{{ .Permalink }}">
+        <span class="post-date">{{ .Date.Format "Jan 2006" }}</span>
+        <span class="post-title">{{ .Title }}</span>
+      </a>
+      {{ end }}
+    </div>
+  </div>
+</section>
+{{ end }}
+
+{{/* Optional social strip. Add a data/creators.yaml with items like
+     `- {handle: "@you", caption: "...", href: "https://..."}` to enable. */}}
+{{ with .Site.Data.creators }}
+<section class="land">
+  <div class="container">
+    <p class="eyebrow">Seen on social</p>
+    <div class="vid-grid">
+      {{ range . }}
+      <a class="vid-tile" href="{{ .href }}" rel="noopener">
+        <span class="vid-play">&#9654;</span>
+        <span class="vid-handle">{{ .handle }} &middot; {{ .caption }}</span>
+      </a>
+      {{ end }}
+    </div>
+  </div>
+</section>
+{{ end }}
+
+{{ with .Content }}
+<section class="land">
+  <div class="container"><div class="prose lead">{{ . | replaceRE `<blockquote>\s*</blockquote>` "" | safeHTML }}</div></div>
+</section>
+{{ end }}
+
+{{/* Booking-engine search widget: PLACEHOLDER. Most engines (Hostaway,
+     Lodgify, Guesty, OwnerRez, ...) give you an embeddable search bar that
+     renders into a div (here #booking-widget) and redirects into your
+     booking site. Paste your engine's own embed snippet below, or remove
+     this block if you don't use one. Example shape:
+
+  <script src="https://YOUR-BOOKING-ENGINE/widget.js"></script>
+  <script>
+    window.searchBar({
+      baseUrl: 'https://book.yourdomain.com/',
+      showLocation: true,
+      openInNewTab: false,
+    });
+  </script>
+*/}}
+{{ end }}

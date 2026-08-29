@@ -1,0 +1,10 @@
+name = "Rental Theme"
+license = "Apache-2.0"
+description = "A minimal, light-only Hugo theme for a short-term-rental marketing site and blog, meant to mirror an external booking site. Sans-serif (Poppins), dark ink on a near-white ground, simple buttons and tag pills, dark footer."
+homepage = "https://github.com/YOURORG/hugo-rentaltheme"
+tags = ["business", "vacation-rental", "minimal"]
+features = ["blog"]
+min_version = "0.91.2"
+
+[author]
+  name = "YOURBRAND"

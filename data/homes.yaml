@@ -1,0 +1,14 @@
+# The homes, for the landing page's property grid. `page` is the local
+# property page; specs mirror your booking site.
+- name: "Mountain Lodge"
+  page: /mountain-lodge/
+  img: /img/mountain-lodge/card.jpg
+  specs: "Mountain Town · 10 guests"
+- name: "Beachfront Condo"
+  page: /beach-condo/
+  img: /img/beach-condo/card.jpg
+  specs: "Beach City · 6 guests"
+- name: "Aurora House"
+  page: /aurora-house/
+  img: /img/aurora-house/card.jpg
+  specs: "Northern City · 8 guests"

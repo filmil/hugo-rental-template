@@ -1,0 +1,61 @@
+name: "Build pages"
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "47 5 * * 0"
+  # Manual runs: the "Run workflow" button, or
+  # `gh workflow run build-pages.yaml`. Useful to redeploy the site
+  # without a commit.
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "Setup bazel"
+        uses: bazel-contrib/setup-bazel@0.15.0
+        with:
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
+
+      # Builds the whole site with the pinned hugo (downloaded by Bazel;
+      # nothing installed on the runner). Output: bazel-bin/site, the same
+      # tree `hugo` used to write to public/.
+      - name: "Build"
+        run: bazel build //:site
+
+      # A site that renders but is missing its key pages should not deploy.
+      - name: "Check the site came out"
+        run: |
+          set -o errexit -o nounset -o pipefail
+          test -s bazel-bin/site/index.html
+          test -s bazel-bin/site/index.xml
+          # The blog and the utility pages must render.
+          test -s bazel-bin/site/post/index.xml
+          for page in about-us contact-us privacy-policy terms-and-conditions; do
+            test -s "bazel-bin/site/${page}/index.html" || {
+              echo "::error::${page} missing from the built site" >&2
+              exit 1
+            }
+          done
+
+      # Preflight: no page may reference a local asset the build lacks.
+      # This is the gate that a racy merge cannot slip a broken image past.
+      - name: "Check local references resolve"
+        run: scripts/check_local_refs.sh bazel-bin/site
+
+      # actions-gh-pages dereferences the bazel-bin convenience symlink.
+      - name: "Deploy"
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          external_repository: YOURORG/yourdomain.com
+          publish_dir: ./bazel-bin/site
+          publish_branch: main
+          deploy_key: "${{ secrets.DEPLOY_KEY }}"

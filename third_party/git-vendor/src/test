@@ -1,0 +1,556 @@
+#!/usr/bin/env python3
+
+import os, sys, subprocess
+import shutil
+from functools import lru_cache
+
+assert os.path.samefile("./test", __file__), "you need to run this from the repo root as ./test"
+tests_root = os.path.abspath("./.tests")
+
+all_tests = []
+def test(f):
+    def wrapped():
+        print("{}...".format(f.__name__), end="", flush=True)
+        try:
+            f(f.__name__)
+        except:
+            print("fail")
+            raise
+        print("pass")
+    all_tests.append(wrapped)
+    return wrapped
+
+def main():
+    for f in all_tests:
+        f()
+
+@test
+def file_name_filtering(test_name):
+    module = import_a_file("./git-vendor")
+    MAYBE = module.MAYBE
+
+    def t(pattern, path, return_maybe_on_prefix_match=False):
+        fn = module.compile_filter(pattern, "--test-pattern=" + pattern, return_maybe_on_prefix_match=return_maybe_on_prefix_match)
+        if path.endswith("/"):
+            is_tree = True
+            path = path[:-1]
+        else:
+            is_tree = False
+        return fn(is_tree, path.split("/"))
+
+    assert t("/a/", "a/")
+    assert t("/a/", "parent/a/") == False
+    assert t("a/", "parent/a/")
+    assert t("a/", "parent/a") == False
+    assert t("a", "parent/a")
+
+    assert t("**/a/b", "a/b")
+    assert t("**/a/b", "a/x") == False
+    assert t("**/a/b", "x/b") == False
+    assert t("**/a/b", "parent/a/b")
+    assert t("**/a/b", "parent/a/b/child") == False
+    assert t("**/a/b", "a/b/child") == False
+
+    assert t("a/**/z", "a/z")
+    assert t("a/**/z", "parent/a/z") == False
+    assert t("**/a/**/z", "parent/a/z")
+    assert t("a/**/z", "a/m/n/o/z")
+    assert t("a/**/z", "a/m/n/o/z/child") == False
+
+    assert t("*/", "a") == False
+    assert t("*/", "a/")
+    assert t("*/", "a/b") == False
+    assert t("*/", "a/b/")
+    assert t("/*/", "a") == False
+    assert t("/*/", "a/")
+    assert t("/*/", "a/b") == False
+    assert t("/*/", "a/b/") == False
+
+    #                                vvvvv         vvvvv
+    assert t("**/a/a/b/**/b/b/a", "a/a/a/b/b/a/a/b/b/b/a")
+    #                              vvvvv       vvvvv
+    assert t("**/a/a/b/**/b/b/a", "a/b/b/a/a/b/b/b/a")
+    #                                  vvvvv     vvvvv
+    assert t("**/a/a/b/**/b/b/a", "a/a/a/b/b/a/a/b/b/a")
+    #                                vvvvv         vvvvv
+    assert t("**/a/a/b/**/b/b/a", "a/a/a/b/a/b/a/a/b/b/a")
+    #                                        vvvvv
+    assert t("**/a/a/b/**/b/b/a", "a/b/a/b/a/a/b/b/a") == False
+    #                              vvvvv
+    assert t("**/a/a/b/**/b/b/a", "a/a/b/b/a") == False
+    #                              vvvvv vvvvv
+    assert t("**/a/a/b/**/b/b/a", "a/a/b/b/b/a")
+
+    assert t("*.txt", "a.txt")
+    assert t("*.txt", "asdf.txt")
+    assert t("*.txt", "asdf.txt.jpg") == False
+    assert t("*.txt", "asdf.jpg") == False
+    assert t(".*.swo", ".test.py.swo")
+    assert t(".*.swo", "test.py.swo") == False
+
+    assert t("src/**/*_test.go", "src/main_test.go")
+    assert t("src/**/*_test.go", "src/decoder/decoder_test.go")
+    assert t("src/**/*_test.go", "src/decoder/decoder_test.pb.go") == False
+    assert t("src/**/*_test.go", "vendor/codelib/decoder_test.go") == False
+    assert t("src/**/*_test.*.go", "src/decoder/decoder_test.pb.go")
+    assert t("src/**/*_test.*.go", "src/decoder/decoder_test.go") == False
+    assert t("doc*/**/README*", "docs/api/README.md")
+    assert t("doc*/**/README*", "doc/api/README.txt")
+    assert t("doc*/**/README*", "docs/README")
+    assert t("doc*/**/README*", "doctored/malware/README (final).exe")
+
+    assert t("a/b", "a", return_maybe_on_prefix_match=True) == False
+    assert t("a/b", "a/", return_maybe_on_prefix_match=True) == MAYBE
+    assert t("a/b", "a/b", return_maybe_on_prefix_match=True) == True
+    assert t("a/b", "a/b/", return_maybe_on_prefix_match=True) == True
+    assert t("a/b", "a/b/c", return_maybe_on_prefix_match=True) == False
+    assert t("a/b", "c/a/b", return_maybe_on_prefix_match=True) == False
+    assert t("src/**/*.zig", "src/", return_maybe_on_prefix_match=True) == MAYBE
+    assert t("src/**/*.zig", "src/README.md", return_maybe_on_prefix_match=True) == False
+    assert t("src/**/*.zig", "src/build.zig", return_maybe_on_prefix_match=True) == True
+    assert t("src/**/*.zig", "src/core/", return_maybe_on_prefix_match=True) == MAYBE
+    assert t("src/**/*.zig", "src/core/stream.zig", return_maybe_on_prefix_match=True) == True
+
+@test
+def follow_branch(test_name):
+    down, up = init(test_name, "downstream", "upstream")
+    git_vendor("add",
+        "--dir", "vendor/up",
+        "--url", up,
+        "--follow-branch", "main",
+        cwd=down)
+    git("commit",
+        "-m", "vendor upstream",
+        cwd=down)
+    assert git_rev_parse_verify("HEAD:vendor/up", cwd=down) == git_rev_parse_verify("HEAD^{tree}", cwd=up)
+
+    clone = git_clone(down, "clone")
+
+    set_file(up, "new_file.txt")
+    git_vendor("update", cwd=down)
+    git("commit",
+        "-m", "update upstream",
+        cwd=down)
+
+    git("pull", "-q", cwd=clone)
+    assert git_rev_parse_verify("HEAD:vendor/up", cwd=down) == git_rev_parse_verify("HEAD^{tree}", cwd=up)
+
+@test
+def pin_to_tag(test_name):
+    down, up = init(test_name, "downstream", "upstream")
+    git("tag", "v1.0.0", cwd=up)
+
+    git_vendor("add",
+        "--dir", "vendor/up",
+        "--url", up,
+        "--pin-to-tag", "v1.0.0",
+        cwd=down)
+    git("commit",
+        "-m", "vendor upstream",
+        cwd=down)
+
+    # Break fetching from this repo.
+    os.rename(os.path.join(up, ".git"), os.path.join(up, ".git.broken"))
+
+    # Updating should trigger no errors, because it should not fetch.
+    git_vendor("update", cwd=down)
+
+@test
+def pin_to_commit(test_name):
+    down, up = init(test_name, "downstream", "upstream")
+    commit_sha1 = git_rev_parse_verify("HEAD", cwd=up)
+    upstream_tree = git_rev_parse_verify("HEAD^{tree}", cwd=up)
+
+    # Make sure the commit isn't any tip.
+    set_file(up, "new_file.txt")
+    assert commit_sha1 != git_rev_parse_verify("HEAD", cwd=up)
+
+    git_vendor("add",
+        "--dir", "vendor/up",
+        "--url", up,
+        "--pin-to-commit", commit_sha1,
+        cwd=down)
+    git("commit",
+        "-m", "vendor upstream",
+        cwd=down)
+    assert git_rev_parse_verify("HEAD:vendor/up", cwd=down) == upstream_tree
+
+    # Break fetching from this repo.
+    os.rename(os.path.join(up, ".git"), os.path.join(up, ".git.broken"))
+
+    # Updating should trigger no errors, because it should not fetch.
+    git_vendor("update", cwd=down)
+
+@test
+def vendor_self(test_name):
+    [repo] = init(test_name, "downstream")
+    git_vendor("self", cwd=repo) # This requires actually hitting github.com.
+
+    assert (os.stat(os.path.join(repo, "deps/git-vendor/git-vendor")).st_mode & 0o777) == 0o755
+
+@test
+def edit_config_through_cli(test_name):
+    down, up = init(test_name, "downstream", "upstream")
+    non_vendoring_entire_tree = git_rev_parse_verify("HEAD^{tree}", cwd=down)
+
+    git_vendor("add",
+        "--dir", "vendor/up",
+        "--url", up,
+        cwd=down)
+    git("commit",
+        "-m", "vendor upstream",
+        cwd=down)
+    assert git_rev_parse_verify("HEAD:vendor/up", cwd=down) == git_rev_parse_verify("HEAD^{tree}", cwd=up)
+
+    # Rename
+    git_vendor("mv",
+        "--dir", "vendor/up",
+        "--new-dir", "vendor/up2",
+        cwd=down)
+    git("commit",
+        "-m", "rename upstream",
+        cwd=down)
+    assert git_rev_parse_verify("HEAD:vendor/up2", cwd=down) == git_rev_parse_verify("HEAD^{tree}", cwd=up)
+
+    # Remove
+    git_vendor("rm",
+        "--dir", "vendor/up2",
+        cwd=down)
+    git("commit",
+        "-m", "remove vendored content",
+        cwd=down)
+    assert git_rev_parse_verify("HEAD^{tree}", cwd=down) == non_vendoring_entire_tree
+
+@test
+def multiple_upstreams(test_name):
+    down, up1, up2 = init(test_name, "downstream", "upstream1", "upstream2")
+    git_vendor("add",
+        "--dir", "vendor/up1",
+        "--url", up1,
+        cwd=down)
+    git_vendor("add",
+        "--dir", "vendor/up2",
+        "--url", up2,
+        cwd=down)
+    git("commit",
+        "-m", "vendor upstreams",
+        cwd=down)
+    assert git_rev_parse_verify("HEAD:vendor/up1", cwd=down) == git_rev_parse_verify("HEAD^{tree}", cwd=up1)
+    assert git_rev_parse_verify("HEAD:vendor/up2", cwd=down) == git_rev_parse_verify("HEAD^{tree}", cwd=up2)
+
+    # Make sure these don't crash.
+    git_vendor("ls", cwd=down)
+    git_vendor("ls", "vendor/up1", cwd=down)
+    git_vendor("ls", "vendor/up2", cwd=down)
+
+@test
+def submodules(test_name):
+    down, up, sub, subsub = init(test_name, "downstream", "upstream", "submodule", "subsubmodule")
+
+    git_submodule("add", sub, "sub", cwd=up)
+    git("commit", "-m", "add submodule", cwd=up)
+
+    git_vendor("add", "vendor/up", "--url", up, cwd=down)
+    git("commit", "-m", "vendor upstream", cwd=down)
+    assert git_rev_parse_verify("HEAD:vendor/up/sub", cwd=down) == git_rev_parse_verify("HEAD^{tree}", cwd=sub)
+
+    # Recursive submodules
+    git_submodule("add", subsub, "subsub", cwd=sub)
+    git("commit", "-m", "add subsubmodule", cwd=sub)
+
+    git_submodule("update", "--remote", cwd=up, suppress_stderr=True)
+    git("commit", "-a", "-m", "bump submodule", cwd=up)
+
+    git_vendor("up", cwd=down)
+    git("commit", "-m", "update vendored content", cwd=down)
+    assert git_rev_parse_verify("HEAD:vendor/up/sub/subsub", cwd=down) == git_rev_parse_verify("HEAD^{tree}", cwd=subsub)
+
+    # At this point we have 3 refs being maintained in refs/vendor/0/*.
+    # (We're not testing for that here, because it's an optimization, not a functional requirement.)
+
+    # Drop all the submodules
+    git("rm", "sub", cwd=up)
+    git("commit", "-m", "remove submodule", cwd=up)
+
+    git_vendor("up", cwd=down)
+    git("commit", "-m", "update vendored content again", cwd=down)
+    assert not os.path.exists(os.path.join(down, "vendor/up/sub"))
+
+    # At this point we're back down to 1 ref being maintained in refs/vendor/0/*.
+    # (We're not testing for that here, because it's an optimization, not a functional requirement.)
+
+@test
+def sha256(test_name):
+    down, up = init(test_name, "downstream", "upstream", sha256=True)
+    commit_sha1 = git_rev_parse_verify("HEAD", cwd=up)
+
+    # Basic branch-follow setup.
+    git_vendor("add", "--dir", "vendor/up", "--url", up, cwd=down)
+    git("commit", "-m", "vendor upstream", cwd=down)
+    assert git_rev_parse_verify("HEAD:vendor/up", cwd=down) == git_rev_parse_verify("HEAD^{tree}", cwd=up)
+
+    # Upstream goes forward. Downstream follows.
+    set_file(up, "b.txt")
+    git_vendor("update", cwd=down)
+    git("commit", "-m", "update", cwd=down)
+    assert git_rev_parse_verify("HEAD:vendor/up", cwd=down) == git_rev_parse_verify("HEAD^{tree}", cwd=up)
+
+    # Give a sha256 object name as a cli parameter.
+    git_vendor("set", "--dir", "vendor/up", "--pin-to-commit", commit_sha1, cwd=down)
+    git("commit", "-m", "pin vendored content", cwd=down)
+    assert git_rev_parse_verify("HEAD:vendor/up", cwd=down) == git_rev_parse_verify(commit_sha1 + "^{tree}", cwd=up)
+
+@test
+def clean_preserves_ignored(test_name):
+    down, up = init(test_name, "downstream", "upstream")
+    first_commit = git_rev_parse_verify("HEAD", cwd=up)
+
+    prefix = ""
+    for i in range(5):
+        set_file(up, prefix + ".gitignore", contents="/a/.gitignore\n")
+        prefix += "a/"
+
+    later_commit = git_rev_parse_verify("HEAD", cwd=up)
+
+    set_file(down, ".gitignore", contents="*.ignored\n")
+
+    git_vendor("add",
+        "--dir", "vendor/up",
+        "--url", up,
+        "--pin-to-commit", later_commit,
+        cwd=down)
+    assert os.path.isdir(os.path.join(down, "vendor/up", "a"))
+    git("commit",
+        "-m", "vendor upstream",
+        cwd=down)
+
+    set_file(down, "vendor/up/trash.ignored")
+
+    git_vendor("set",
+        "--dir", "vendor/up",
+        "--pin-to-commit", first_commit,
+        cwd=down)
+    git("commit",
+        "-m", "remove most vendored content",
+        cwd=down)
+    assert not os.path.isdir(os.path.join(down, "vendor/up/a"))
+    assert os.path.isfile(os.path.join(down, "vendor/up/trash.ignored"))
+
+@test
+def errors(test_name):
+    # Setup some normal things:
+    down, up1, up2 = init(test_name, "downstream", "upstream1", "upstream2")
+    git_vendor("add",
+        "--dir", "vendor/up1",
+        "--url", up1,
+        cwd=down)
+    git_vendor("add",
+        "--dir", "vendor/up2",
+        "--url", up2,
+        cwd=down)
+    git("commit",
+        "-m", "vendor upstreams",
+        cwd=down)
+
+    expect_subprocess_error("usage:", lambda: git_vendor("asdf", cwd=down))
+    expect_subprocess_error("usage:", lambda: git_vendor("add", "a", "b", cwd=down))
+    expect_subprocess_error("usage:", lambda: git_vendor("mv", "a", "b", "c", cwd=down))
+    expect_subprocess_error("usage:", "required", "--url", lambda: git_vendor("add", "a", cwd=down))
+
+    expect_subprocess_error("not vendored content", "asdf", lambda: git_vendor("ls", "asdf", cwd=down))
+    expect_subprocess_error("not vendored content", "'as df'", lambda: git_vendor("ls", "as df", cwd=down))
+    expect_subprocess_error("not found in external repo", "'as df'", lambda: git_vendor("set", "vendor/up1", "--subdir", "as df", cwd=down))
+
+    expect_subprocess_error("--dir is invalid", lambda: git_vendor("add", "--dir", ".", "--url=https://a.invalid/", cwd=down))
+    expect_subprocess_error("--dir is invalid", lambda: git_vendor("add", "--dir", "..", "--url=https://a.invalid/", cwd=down))
+    expect_subprocess_error("--dir is invalid", lambda: git_vendor("add", "--dir", "/vendor/up3", "--url=https://a.invalid/", cwd=down))
+    expect_subprocess_error("already a vendored dir", lambda: git_vendor("add", "vendor/up2", "--url=https://a.invalid/", cwd=down))
+    expect_subprocess_error("within an already vendored dir", lambda: git_vendor("add", "vendor/up2/subdir", "--url=https://a.invalid/", cwd=down))
+
+    expect_subprocess_error("--new-dir is invalid", lambda: git_vendor("mv", "vendor/up1", ".", cwd=down))
+    expect_subprocess_error("--new-dir is invalid", lambda: git_vendor("mv", "vendor/up1", "..", cwd=down))
+    expect_subprocess_error("--new-dir is invalid", lambda: git_vendor("mv", "vendor/up1", "/vendor/up3", cwd=down))
+    expect_subprocess_error("--subdir is invalid", lambda: git_vendor("set", "vendor/up1", "--subdir", ".", cwd=down))
+    expect_subprocess_error("--subdir is invalid", lambda: git_vendor("set", "vendor/up1", "--subdir", "..", cwd=down))
+    expect_subprocess_error("--subdir must be a relative path", lambda: git_vendor("set", "vendor/up1", "--subdir", "/vendor/up3", cwd=down))
+
+    git_vendor("ls", "../up2", cwd=os.path.join(down, "vendor/up1"))
+    expect_subprocess_error("--new-dir is invalid", lambda: git_vendor("mv", "../up2", "/tmp", cwd=os.path.join(down, "vendor/up1")))
+    expect_subprocess_error("itself", lambda: git_vendor("mv", "../up2", "../../vendor/up2", cwd=os.path.join(down, "vendor/up1")))
+    expect_subprocess_error("within an already vendored dir", lambda: git_vendor("mv", "../up2", "../../vendor/up1/subdir", cwd=os.path.join(down, "vendor/up1")))
+    expect_subprocess_error("would completely contain", lambda: git_vendor("mv", "vendor/up2", "vendor", cwd=down))
+
+    expect_subprocess_error("no content after filters", lambda: git_vendor("set", "vendor/up1", "--include", "asdf", cwd=down))
+    expect_subprocess_error("no content after filters", lambda: git_vendor("set", "vendor/up1", "--exclude", "*.txt", cwd=down))
+    expect_subprocess_error("Invalid pattern", lambda: git_vendor("set", "vendor/up1", "--include", "/", cwd=down))
+    expect_subprocess_error("Invalid pattern", lambda: git_vendor("set", "vendor/up1", "--include", "a//b", cwd=down))
+    expect_subprocess_error("please use", "instead", lambda: git_vendor("set", "vendor/up1", "--include", "**", cwd=down))
+    expect_subprocess_error("please use", "instead", lambda: git_vendor("set", "vendor/up1", "--include", "**/", cwd=down))
+    expect_subprocess_error("cannot contain", lambda: git_vendor("set", "vendor/up1", "--include", "a/./b", cwd=down))
+    expect_subprocess_error("cannot contain", lambda: git_vendor("set", "vendor/up1", "--include", "a/../b", cwd=down))
+
+def init(test_name, *repo_names, sha256=False):
+    test_dir = os.path.join(tests_root, test_name)
+    try:
+        shutil.rmtree(test_dir)
+    except FileNotFoundError:
+        pass
+    os.makedirs(test_dir)
+
+    repo_dirs = []
+    for repo_name in repo_names:
+        repo_dir = os.path.join(test_dir, repo_name)
+        os.makedirs(repo_dir)
+        init_args = []
+        if sha256:
+            init_args.append("--object-format=sha256")
+        git("init",
+            "--initial-branch", "main",
+            *init_args,
+            cwd=repo_dir)
+        git("commit",
+            "--allow-empty",
+            "-m", "init repo: " + repo_name,
+            cwd=repo_dir)
+        set_file(repo_dir, repo_name + ".txt")
+
+        repo_dirs.append(repo_dir)
+
+    return repo_dirs
+
+def set_file(repo_dir, file_name, *, contents=None, commit=True):
+    if contents == None:
+        contents = "the contents of {}\n".format(file_name)
+    full_path = os.path.join(repo_dir, file_name)
+    os.makedirs(os.path.dirname(full_path), exist_ok=True)
+    with open(os.path.join(repo_dir, file_name), "w") as f:
+        f.write(contents)
+    if commit:
+        git("add", "-f", file_name, cwd=repo_dir)
+        git("commit", "-m", "set file: " + file_name, cwd=repo_dir)
+
+def git_clone(origin_dir, repo_name):
+    test_dir = os.path.dirname(origin_dir)
+    repo_dir = os.path.join(test_dir, repo_name)
+    git("clone", "-q", origin_dir, repo_dir, cwd=test_dir)
+
+    return repo_dir
+
+def git_submodule(*cmd, cwd, suppress_stderr=False):
+    git(
+        # Submodules with file system urls are a security hazard,
+        # so give this option to enable it during these tests.
+        "-c", "protocol.file.allow=always",
+        "submodule", "--quiet",
+        *cmd,
+        cwd=cwd, suppress_stderr=suppress_stderr)
+
+def git_rev_parse_verify(arg, *, cwd):
+    return git("rev-parse", "--verify", arg, cwd=cwd).rstrip()
+
+def git(*args, cwd, suppress_stderr=False):
+    cmd = ["git"]
+    cmd.extend(args)
+    kwargs = {}
+    if suppress_stderr:
+        kwargs["stderr"] = subprocess.DEVNULL
+    process = subprocess.run(cmd,
+        cwd=cwd, env=get_git_env(),
+        check=True, stdout=subprocess.PIPE, encoding="utf8",
+        **kwargs)
+    return process.stdout
+
+_git_vendor_captured_stderr = None
+def git_vendor(*args, cwd):
+    global _git_vendor_captured_stderr
+    _git_vendor_captured_stderr = None
+    cmd = [os.path.abspath("./git-vendor")]
+    cmd.extend(args)
+    completed_process = subprocess.run(cmd,
+        cwd=cwd, env=get_git_env(),
+        capture_output=True, encoding="utf8",
+    )
+    try:
+        completed_process.check_returncode()
+    except subprocess.CalledProcessError:
+        _git_vendor_captured_stderr = completed_process.stderr
+        raise
+
+def get_git_vendor_stderr():
+    global _git_vendor_captured_stderr
+    result = _git_vendor_captured_stderr
+    _git_vendor_captured_stderr = None
+    return result
+
+
+@lru_cache()
+def get_git_env():
+    """
+    We want commit hashes to be deterministic across time and different users running the test suite.
+    This environment disables all user configuration and system configuration for git's behavior,
+    and freezes time at a constant date.
+    """
+    # Start with a copy of our own environment, then scrub out any git-specific configuration.
+    git_env = os.environ.copy()
+    for name in list(git_env.keys()):
+        if name.startswith("GIT_"):
+            del git_env[name]
+
+    # Disable reading /etc/gitconfig.
+    git_env["GIT_CONFIG_NOSYSTEM"] = "1"
+    # Ensure ~/.gitconfig is never used.
+    git_env["HOME"] = "/dev/null"
+
+    # Don't expose system information when making commits.
+    git_env["GIT_AUTHOR_NAME"] = git_env["GIT_COMMITTER_NAME"] = "Nobody"
+    git_env["GIT_AUTHOR_EMAIL"] = git_env["GIT_COMMITTER_EMAIL"] = "nobody@none.invalid"
+    # Don't expose current time when making commits.
+    earliest_allowed_time = "100000000 +0000" # "Sat Mar 3 09:46:40 1973 +0000"
+    git_env["GIT_AUTHOR_DATE"] = git_env["GIT_COMMITTER_DATE"] = earliest_allowed_time
+
+    return git_env
+
+def import_a_file(path):
+    from importlib.util import spec_from_loader, module_from_spec
+    from importlib.machinery import SourceFileLoader
+
+    module_name = os.path.basename(path)
+
+    with attribute_patcher(sys, "dont_write_bytecode", True):
+        spec = spec_from_loader(module_name, SourceFileLoader(module_name, path))
+        module = module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        return module
+
+class attribute_patcher:
+    def __init__(self, obj, attr, value):
+        self.obj = obj
+        self.attr = attr
+        self.value = value
+    def __enter__(self):
+        self.old_value = getattr(self.obj, self.attr)
+        setattr(self.obj, self.attr, self.value)
+    def __exit__(self, *args):
+        setattr(self.obj, self.attr, self.old_value)
+
+def expect_subprocess_error(*args):
+    error_strs, fn = args[:-1], args[-1]
+    get_git_vendor_stderr()
+    try:
+        fn()
+    except subprocess.CalledProcessError:
+        stderr = get_git_vendor_stderr()
+        assert "Traceback" not in stderr, "subprocess crashed:\n" + stderr
+        for error_str in error_strs:
+            assert error_str in stderr, "Expected {} to be found in stderr:\n{}".format(repr(error_str), stderr)
+        return
+    assert False, "Expected child process to crash"
+
+if __name__ == "__main__":
+    try:
+        main()
+    except subprocess.CalledProcessError:
+        stderr = get_git_vendor_stderr()
+        if stderr: print(stderr)
+        raise

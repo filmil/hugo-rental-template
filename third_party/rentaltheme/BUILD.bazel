@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: Apache-2.0
+# Bazel definition of the theme, for sites that build with rules_hugo.
+#
+# This file is inert in this repository (there is no MODULE.bazel here);
+# it takes effect where the theme is vendored into a consuming site --
+# `@rules_hugo` then resolves against that site's dependencies. The
+# `hugo_site` rule lays the files out under themes/<theme_name>/ from
+# this package's path.
+load("@rules_hugo//hugo:rules.bzl", "hugo_theme")
+
+hugo_theme(
+    name = "rentaltheme",
+    srcs = glob(
+        ["**"],
+        exclude = [
+            "BUILD.bazel",
+            "README.md",
+            "LICENSE",
+        ],
+    ),
+    theme_name = "rentaltheme",
+    visibility = ["//visibility:public"],
+)

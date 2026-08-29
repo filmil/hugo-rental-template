@@ -1,0 +1,44 @@
+name: "Test a pull request"
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "Setup bazel"
+        uses: bazel-contrib/setup-bazel@0.15.0
+        with:
+          bazelisk-cache: true
+          disk-cache: ${{ github.workflow }}
+          repository-cache: true
+
+      - name: "Build"
+        run: bazel build //:site
+
+      # Same guard the deploy runs, so a pull request that drops a key page
+      # fails here rather than on main.
+      - name: "Check the site came out"
+        run: |
+          set -o errexit -o nounset -o pipefail
+          test -s bazel-bin/site/index.html
+          test -s bazel-bin/site/index.xml
+          # The blog and the utility pages must render.
+          test -s bazel-bin/site/post/index.xml
+          for page in about-us contact-us privacy-policy terms-and-conditions; do
+            test -s "bazel-bin/site/${page}/index.html" || {
+              echo "::error::${page} missing from the built site" >&2
+              exit 1
+            }
+          done
+
+      # Preflight: no page may reference a local asset the build lacks.
+      # This is the gate that a racy merge cannot slip a broken image past.
+      - name: "Check local references resolve"
+        run: scripts/check_local_refs.sh bazel-bin/site

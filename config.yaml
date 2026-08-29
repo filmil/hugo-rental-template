@@ -1,0 +1,93 @@
+baseurl: "https://www.yourdomain.com/"
+languageCode: "en-us"
+title: "YOURBRAND Vacation Rentals"
+theme: "rentaltheme"
+ignoreFiles: ["\\.Rmd$", "\\.Rmarkdown$", "_cache$"]
+
+permalinks:
+  note: "/note/:year/:month/:day/:slug/"
+  post: "/post/:year/:month/:day/:slug/"
+
+menu:
+  # ======================== INVARIANT: TWO SITES MATCH ========================
+  # This marketing site and your separate booking site MUST show the same top
+  # bar. If your booking engine (Hostaway, Lodgify, Guesty, OwnerRez, ...)
+  # renders its own header, mirror ANY change to menu.main below over there
+  # too -- add, remove, reorder, or rename a header item on one side only by
+  # doing the same on the other. Keep the two navbars identical.
+  # ===========================================================================
+  # Replace book.yourdomain.com with your booking site, and www.yourdomain.com
+  # with this marketing site. The "Destinations" item points back at this
+  # site's home from both bars; "Journal" is this Hugo blog.
+  main:
+    - name: "Book here!"
+      url: "https://book.yourdomain.com/"
+      weight: 10
+    - name: "All listings"
+      url: "https://book.yourdomain.com/all-listings"
+      weight: 20
+    - name: "About Us"
+      url: "https://book.yourdomain.com/about-us"
+      weight: 30
+    - name: "Contact Us"
+      url: "https://book.yourdomain.com/contact-us"
+      weight: 40
+    - name: "Destinations"
+      url: "https://www.yourdomain.com/"
+      weight: 45
+    - name: "Journal"
+      url: "/post/"
+      weight: 50
+  footer:
+    - name: "Book here!"
+      url: "https://book.yourdomain.com/"
+      weight: 5
+    - name: Journal
+      url: "/post/"
+      weight: 10
+    - name: "Our Privacy Policy"
+      url: "/privacy-policy/"
+      weight: 20
+    - name: "Our Terms and Conditions"
+      url: "/terms-and-conditions/"
+      weight: 30
+    - name: "Contact Us"
+      url: "https://book.yourdomain.com/contact-us"
+      weight: 40
+    - name: "Destinations"
+      url: "https://www.yourdomain.com/"
+      weight: 45
+    - name: "Journal"
+      url: "/post/"
+      weight: 50
+
+params:
+  description: "Vacation rentals in the mountains, on the coast, and up north. Book directly and save."
+  favicon: "/logo/brand-mark.svg"
+  # Fixed-ink logos: the header bar is light and the footer dark in every
+  # colour scheme, so each surface gets the matching ink. The
+  # scheme-following /logo/brand-logo.svg would be wrong on both (a dark-mode
+  # visitor would get white-on-white in the header).
+  # The brand renders as the mark plus a typeset wordmark (brandTextA at 74%
+  # ink + brandTextB) in the chrome. The full lockups stay published under
+  # /logo/ for other uses.
+  logo: "/logo/brand-mark-black.svg"
+  footerLogo: "/logo/brand-mark-white.svg"
+  # The wordmark is split so the first part renders at reduced ink. Set these
+  # to the two halves of your brand name (e.g. "Your" + "Brand").
+  brandTextA: "YOUR"
+  brandTextB: "BRAND"
+  # Your Google Analytics 4 measurement id. Leave blank to disable analytics.
+  gtag: "G-XXXXXXXXXX"
+  copyright: "YOURBRAND"
+  # The footer "Cookie Preferences" link. foot_custom.html wires it to your
+  # consent manager's drawer; replace with your own or remove it.
+  cookieLink: "#cookie-preferences"
+  footer: "YOURBRAND &middot; 123 Example Street, Suite 100, Your City, ST 00000"
+
+markup:
+  highlight:
+    codeFences: false
+  goldmark:
+    renderer:
+      unsafe: true

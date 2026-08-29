@@ -1,0 +1,375 @@
+/* SPDX-License-Identifier: Apache-2.0
+ *
+ * The YOURBRAND theme: the booking site's twin (design study "A - Mirror").
+ * Every value here is taken from book.yourdomain.com's repaired
+ * design: its designSettings, its inlined stylesheet, and the repaired
+ * head script. Light-only by design; the booking site has no dark mode.
+ */
+
+:root {
+  /* surfaces, from the booking site */
+  --bg: #F8F8F8;
+  --surface: #ffffff;
+  --line: #DCDCDC;
+  /* ink */
+  --ink: #000000;
+  --muted: rgba(0, 0, 0, 0.5);
+  /* the only chromatic values the booking site uses */
+  --accent: #693700;       /* brown tag pills */
+  --blue: #5975c9;         /* configured middle color: secondary borders */
+  --hover: #4d88fe;        /* the one live rule of the original custom CSS */
+  /* radii, from the repaired design */
+  --r-btn: 10px;
+  --r-card: 20px;
+  --r-tag: 5px;
+  /* layout, from the booking site */
+  --wide: 76.5rem;
+  --gap: 1rem;
+  --sans: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5rem;
+}
+img { max-width: 100%; }
+
+a { color: var(--ink); }
+a:hover { color: var(--hover); }
+
+.skip-link {
+  position: absolute; left: -999px; top: 0;
+  background: var(--surface); padding: 0.5rem 1rem; z-index: 100;
+}
+.skip-link:focus { left: 0; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+.container { max-width: var(--wide); margin: 0 auto; padding: 0 var(--gap); }
+
+/* ---- header: the booking site's, replicated ---- */
+.site-header {
+  background: var(--surface);
+  box-shadow: 0 0.125rem 0.75rem rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 10;
+}
+.nav-row {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 3.5rem;               /* 56px, the booking site's mobile bar */
+}
+.brand {
+  display: flex; align-items: center; height: 100%;
+  padding: 10px 0;              /* the booking site's logo padding */
+  text-decoration: none;
+}
+.brand img { display: block; height: 100%; width: auto; }
+.brand-text { font-weight: 800; font-size: 1.25rem; }
+/* The typeset wordmark beside the mark. In the original lockup "Sharp" is
+   #424242, which is the ink at 74% -- opacity preserves that relationship
+   on the white header and the black footer alike. Text height matches the
+   lockup's proportions: the wordmark em is about 46% of the mark height. */
+.brand { gap: 0.55rem; }
+.brand-word {
+  font-weight: 700; font-size: 1.5625rem; line-height: 1;
+  letter-spacing: 0;
+}
+.brand-word .b1 { opacity: 0.74; }
+.brand-foot { height: auto; padding: 0; }
+.brand-foot img { height: 2rem; }
+.brand-foot .brand-word { font-size: 1.125rem; }
+.site-nav { display: none; }
+.site-nav a {
+  font-size: 1.0625rem; line-height: 1.25rem; font-weight: 600;
+  text-decoration: none; text-align: center;
+}
+/* the 4px dot between items, 40% black, 1rem either side */
+.site-nav a + a::before {
+  content: ""; display: inline-block; vertical-align: middle;
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--ink); opacity: 0.4; margin: 0 1rem;
+}
+/* hamburger: three 1.25rem x 0.125rem bars, shown below 48rem */
+.nav-toggle { display: none; }
+.nav-burger {
+  display: flex; flex-direction: column; gap: 0.3125rem;
+  cursor: pointer; padding: 0.5rem 0;
+}
+.nav-burger span {
+  width: 1.25rem; height: 0.125rem; border-radius: 0.125rem;
+  background: var(--ink); transition: all 0.3s linear;
+}
+.nav-toggle:checked ~ .site-nav {
+  display: flex; flex-direction: column; align-items: center; gap: 1rem;
+  position: absolute; left: 0; right: 0; top: 100%;
+  background: var(--surface); padding: 1.25rem var(--gap);
+  box-shadow: 0 0.75rem 0.75rem rgba(0, 0, 0, 0.08);
+}
+.nav-toggle:checked ~ .site-nav a + a::before { display: none; }
+@media (min-width: 48rem) {
+  .nav-row { height: 4.6875rem; }   /* 75px, the desktop bar */
+  .nav-burger { display: none; }
+  .site-nav { display: flex; align-items: center; }
+}
+
+/* ---- content ---- */
+main { padding: 2.5rem 0 5rem; }
+.page-title { font-size: 2rem; font-weight: 800; line-height: 1.2; }
+h1, h2, h3 { text-wrap: balance; }
+h2 { font-size: 1.5rem; font-weight: 700; }
+
+.prose { max-width: 70ch; }
+.prose.lead { font-size: 1.0625rem; }
+.prose img { border-radius: var(--r-card); }
+.prose blockquote {
+  margin: 1rem 0; padding: 0.25rem 1.25rem;
+  border-left: 3px solid var(--accent); color: var(--muted);
+}
+.prose hr { border: 0; border-top: 1px solid var(--ink); opacity: 0.3; margin: 2.4rem 0; }
+
+/* ---- buttons (site content can use .btn) ---- */
+.btn, button.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--sans); font-size: 1rem; font-weight: 600;
+  min-height: 3.25rem; padding: 0 1.5rem;
+  border-radius: var(--r-btn);
+  border: 1px solid var(--ink); background: var(--ink); color: #fff;
+  text-decoration: none; cursor: pointer;
+}
+.btn:hover { background: rgba(0, 0, 0, 0.75); border-color: transparent; color: #fff; }
+.btn.secondary { background: transparent; border-color: var(--blue); color: var(--ink); }
+
+/* ---- entry list (home + sections + tag pages) ---- */
+.entries { display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; }
+.entry {
+  position: relative;               /* anchor for the stretched title link */
+  display: flex; gap: 1.25rem; align-items: baseline;
+  background: var(--surface); border-radius: var(--r-btn);
+  padding: 1rem 1.25rem;
+}
+.entry:hover { box-shadow: 0 0.125rem 0.75rem rgba(0, 0, 0, 0.08); }
+.entry-date { color: var(--muted); font-size: 0.8125rem; white-space: nowrap; }
+.entry-body { min-width: 0; flex: 1; }
+.entry-title { display: block; font-weight: 700; text-decoration: none; color: inherit; }
+.entry-title:hover { color: var(--hover); }
+/* the title covers the whole card, so clicking anywhere opens the post... */
+.entry-link::after {
+  content: ""; position: absolute; inset: 0; border-radius: var(--r-btn);
+}
+/* ...but tags and other real links sit above that overlay and stay clickable */
+.entry-tags, .entry-summary { position: relative; }
+.entry-tags a { position: relative; z-index: 1; }
+.entry-tags {
+  display: flex; flex-wrap: wrap; gap: 0.375rem; margin-top: 0.375rem;
+}
+.entry-summary {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden; color: var(--muted); font-size: 0.875rem; margin-top: 0.25rem;
+}
+
+.tag {
+  display: inline-block; font-size: 0.8125rem; font-weight: 300;
+  background: var(--accent); color: #fff;
+  border-radius: var(--r-tag); padding: 0.125rem 0.625rem;
+}
+.entry:hover .tag { color: #fff; }
+
+/* ---- article ---- */
+.article-head { margin-bottom: 1.5rem; }
+.article-head h1 { font-size: 2rem; font-weight: 800; line-height: 1.2; margin-bottom: 0.5rem; }
+.article-meta { color: var(--muted); font-size: 0.875rem; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+
+/* ---- tags page ---- */
+.term-cloud { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.term-cloud a {
+  display: inline-block; background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r-tag); padding: 0.375rem 0.75rem;
+  text-decoration: none; font-size: 0.9375rem;
+}
+.term-cloud .count { color: var(--muted); font-size: 0.8125rem; }
+
+/* ---- footer: black, like the booking site ---- */
+.site-footer {
+  background: #000; color: #fff; margin-top: 2rem;
+  padding: 2.75rem 0 1.5rem;
+  text-align: center;
+}
+.foot-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1.25rem; flex-wrap: wrap;
+}
+.foot-nav { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+.site-footer a { color: #fff; text-decoration: none; font-size: 0.9375rem; }
+.site-footer a:hover { color: var(--hover); }
+.foot-legal { margin-top: 1.5rem; font-size: 0.875rem; opacity: 0.7; }
+.foot-legal a { text-decoration: underline; }
+.fineprint { font-size: 0.8125rem; }
+
+/* ---- one breakpoint, like the booking site's tablet cut ---- */
+@media (max-width: 48rem) {
+  .entry { flex-direction: column; gap: 0.25rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* ================= landing page (layouts/index.html) ================= */
+
+/* hero: the booking site's repaired hero, photo + white title + band */
+.hero {
+  background-size: cover; background-position: center;
+  position: relative;
+}
+.hero-inner {
+  max-width: var(--wide); margin: 0 auto; padding: 5.5rem var(--gap) 4.5rem;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+.hero h1 {
+  margin: 0; color: #fff; font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 700; line-height: 1.15;
+  text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5);
+  text-transform: none;
+}
+.hero .hero-sub {
+  margin: 0.75rem 0 0; color: #fff; font-weight: 300; font-size: 0.9375rem;
+  padding: 4px 35px;
+  background: linear-gradient(to right, transparent, #000 50%, transparent);
+}
+.hero-search { margin-top: 1.75rem; width: 100%; max-width: 46rem; }
+/* your booking-engine search widget renders into this div */
+#booking-widget { width: 100%; }
+
+/* generic landing section */
+.land { padding: 2.75rem 0; }
+.land.alt { background: var(--surface); }
+.land .eyebrow {
+  margin: 0 0 0.25rem; color: var(--muted);
+  font-size: 0.71875rem; letter-spacing: 0.14em; text-transform: uppercase;
+  font-weight: 700;
+}
+.land h2 { margin: 0 0 1.375rem; font-size: 1.625rem; font-weight: 800; }
+
+/* destination cards */
+.dest-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+.dest-card { display: block; text-decoration: none; color: inherit; }
+.dest-card:hover { color: inherit; }
+.dest-imgbox {
+  position: relative; display: block; height: 12rem; overflow: hidden;
+  border-radius: var(--r-card); background: rgba(0, 0, 0, 0.1);
+}
+.dest-imgbox img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.dest-tags { position: absolute; top: 0.75rem; left: 0.75rem; display: flex; gap: 0.375rem; }
+.dest-title { display: block; font-weight: 800; font-size: 1.03125rem; margin-top: 0.75rem; }
+.dest-card:hover .dest-title { color: var(--hover); }
+.dest-meta { display: block; color: var(--muted); font-size: 0.8125rem; margin-top: 0.125rem; }
+
+/* journal strip */
+.post-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+.post-tile {
+  display: block; background: var(--bg); border-radius: var(--r-btn);
+  padding: 1rem 1.125rem; text-decoration: none; color: inherit;
+}
+.land.alt .post-tile { background: var(--bg); }
+.post-tile:hover { box-shadow: 0 0.125rem 0.75rem rgba(0, 0, 0, 0.08); color: inherit; }
+.post-date {
+  display: block; color: var(--muted);
+  font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.post-title { display: block; font-weight: 600; font-size: 0.9375rem; margin-top: 0.375rem; line-height: 1.4; }
+
+/* TikTok / creator strip */
+.vid-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+.vid-tile {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  height: 7.5rem; background: #1a1a1a; color: #fff;
+  border-radius: var(--r-btn); text-decoration: none;
+}
+.vid-tile:hover { color: #fff; opacity: 0.9; }
+.vid-play { font-size: 1.375rem; }
+.vid-handle {
+  position: absolute; bottom: 0.5rem; left: 0.75rem;
+  font-size: 0.75rem; opacity: 0.8;
+}
+
+@media (max-width: 48rem) {
+  .dest-grid, .post-grid, .vid-grid { grid-template-columns: 1fr; }
+  .hero-inner { padding: 3.5rem var(--gap) 3rem; }
+}
+
+/* "browse by" facet links on the landing page */
+.facet-row { display: flex; flex-wrap: wrap; gap: 0.625rem; }
+.facet-row a {
+  display: inline-block; background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--r-tag);
+  padding: 0.5rem 0.875rem; font-size: 0.9375rem; font-weight: 600;
+  text-decoration: none;
+}
+.facet-row a:hover { border-color: var(--hover); }
+
+/* ================= property pages (layouts/property/single.html) ===== */
+.prop-hero { border-radius: var(--r-card); overflow: hidden; height: 22rem; }
+.prop-hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.prop-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; }
+.prop-head h1 { font-size: 2rem; font-weight: 800; line-height: 1.2; margin: 0; }
+.prop-specs { color: var(--muted); font-size: 0.9375rem; white-space: nowrap; }
+.prop-amenities { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }
+.prop-amenities span {
+  height: 2.5rem; display: inline-flex; align-items: center;
+  padding: 0 1rem; border-radius: 2rem;
+  background: rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.2);
+  font-size: 0.875rem;
+}
+.prop-cta { margin: 1.5rem 0; }
+.prop-gallery {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;
+  margin-top: 2rem;
+}
+.prop-gallery img {
+  width: 100%; height: 11rem; object-fit: cover; display: block;
+  border-radius: var(--r-btn);
+}
+@media (max-width: 48rem) {
+  .prop-gallery { grid-template-columns: repeat(2, 1fr); }
+  .prop-hero { height: 14rem; }
+}
+
+/* landing: the property grid ("Our homes") */
+.homes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+.home-tile { display: block; text-decoration: none; color: inherit; }
+.home-tile:hover { color: inherit; }
+.home-tile .m-img { display: block; height: 9.5rem; overflow: hidden; border-radius: var(--r-card); }
+.home-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.home-tile .t { display: block; font-weight: 800; font-size: 0.9375rem; margin-top: 0.5rem; }
+.home-tile:hover .t { color: var(--hover); }
+.home-tile .s { display: block; color: var(--muted); font-size: 0.8125rem; }
+@media (max-width: 48rem) {
+  .homes-grid { grid-template-columns: 1fr; }
+}
+
+/* prose figures with credit captions (nearby-attraction photos) */
+.prose figure { margin: 1.5rem 0; }
+.prose figure img { width: 100%; border-radius: var(--r-card); display: block; }
+.prose figcaption { color: var(--muted); font-size: 0.8125rem; margin-top: 0.375rem; }
+
+/* article navigation (prev/next + back to journal) */
+.post-nav { margin-top: 2.5rem; border-top: 1px solid var(--line); padding-top: 1.25rem; }
+.post-nav-links { display: flex; gap: 1rem; justify-content: space-between; flex-wrap: wrap; }
+.post-nav-links a {
+  flex: 1 1 45%; min-width: 12rem; text-decoration: none; color: inherit;
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--r-btn); padding: 0.75rem 1rem;
+}
+.post-nav-links a:hover { border-color: var(--hover); }
+.post-nav-next { text-align: right; }
+.post-nav-dir { display: block; font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.post-nav-title { display: block; font-weight: 700; font-size: 0.9375rem; margin-top: 0.25rem; }
+.post-nav-all { margin-top: 1rem; }
+.post-nav-all a { font-weight: 600; }
+/* a tag that is a link shows it */
+a.tag { text-decoration: none; }
+a.tag:hover { background: var(--accent); color: #fff; opacity: 0.9; }

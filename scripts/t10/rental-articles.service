@@ -1,0 +1,13 @@
+[Unit]
+Description=Rental site monthly article generator (T.10)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# Adjust this path to wherever the repo lives.
+WorkingDirectory=%h/path/to/rental-site
+ExecStart=%h/path/to/rental-site/scripts/generate_articles.sh
+# The generator opens a PR; it must not run unattended without review, which
+# is exactly what draft:true guarantees on the output.
+TimeoutStartSec=1800

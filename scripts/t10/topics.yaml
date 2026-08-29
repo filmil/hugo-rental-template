@@ -1,0 +1,41 @@
+# T.10 article topic queue. The generator takes the next unwritten topic in
+# order, per destination, and writes a draft post about it. A topic is
+# "written" when a post with its slug exists under content/post/. Add topics
+# to the end of a list to extend the queue.
+#
+# These are generic example destinations and topics; replace them with your
+# own. The listing_filter URLs are placeholders on book.yourdomain.com.
+#
+# season: winter | summer | any -- steers the image search (prefer skiing/snow
+#   for winter, hiking/beach for summer). Banned topics are enforced in the
+#   prompt and never appear here.
+
+destinations:
+  - name: "Mountain Town"
+    listing_filter: "https://book.yourdomain.com/all-listings?category=10001"
+    prefer_images: "skiing photos for winter, hiking photos for summer"
+    banned: ["wildfire season"]
+    topics:
+      - {slug: mountain-ski-events, title_hint: "Ski resort events near Mountain Town", season: winter}
+      - {slug: mountain-restaurants, title_hint: "Where to eat in Mountain Town", season: any}
+      - {slug: mountain-venues, title_hint: "Venues and gathering spots around Mountain Town", season: any}
+      - {slug: mountain-summer-hiking, title_hint: "Summer hiking trails near Mountain Town", season: summer}
+      - {slug: mountain-national-park, title_hint: "Day trips to the nearest national park", season: any}
+
+  - name: "Beach City"
+    listing_filter: "https://book.yourdomain.com/all-listings?category=10002"
+    prefer_images: "photos showing sand, sea, clear sky and bright sun"
+    banned: ["hurricane season"]
+    topics:
+      - {slug: beach-festivals, title_hint: "Festivals in Beach City", season: summer}
+      - {slug: beach-events, title_hint: "Beach events along the coast", season: summer}
+
+  - name: "Northern City"
+    listing_filter: "https://book.yourdomain.com/all-listings?category=10003"
+    prefer_images: "photos showing wintertime"
+    banned: ["off-season caveats"]
+    topics:
+      - {slug: northern-equipment-rentals, title_hint: "Winter equipment rentals in Northern City", season: winter}
+      - {slug: northern-tours, title_hint: "Tours from Northern City (aurora and wildlife)", season: winter}
+      - {slug: northern-transportation, title_hint: "Getting around Northern City and the region", season: winter}
+      - {slug: northern-skiing, title_hint: "Skiing at slopes near Northern City", season: winter}

@@ -1,0 +1,25 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ if not .IsHome }}{{ .Title }} | {{ end }}{{ .Site.Title }}</title>
+{{ with .Site.Params.description }}<meta name="description" content="{{ . }}">{{ end }}
+{{ $fav := .Site.Params.favicon | default "/favicon.png" }}
+{{ $favtype := "image/png" }}
+{{ if strings.HasSuffix $fav ".svg" }}{{ $favtype = "image/svg+xml" }}{{ else if strings.HasSuffix $fav ".ico" }}{{ $favtype = "image/x-icon" }}{{ end }}
+<link rel="icon" type="{{ $favtype }}" href="{{ $fav | relURL }}">
+<link rel="canonical" href="{{ .Permalink }}">
+<link rel="alternate" type="application/rss+xml" title="{{ .Site.Title }}" href="{{ "index.xml" | absURL }}">
+{{/* Poppins, the booking site's face; weights match what it actually loads. */}}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap">
+<link rel="stylesheet" href="{{ "css/theme.css" | relURL }}">
+{{ with .Site.Params.gtag }}
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ . }}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '{{ . }}');
+</script>
+{{ end }}
+{{ if templates.Exists "partials/head_custom.html" }}{{ partial "head_custom.html" . }}{{ end }}

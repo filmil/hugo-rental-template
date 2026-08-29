@@ -1,0 +1,54 @@
+# SPDX-License-Identifier: Apache-2.0
+load("@buildifier_prebuilt//:rules.bzl", "buildifier")
+load("@rules_hugo//hugo:rules.bzl", "hugo_serve", "hugo_site")
+
+# The whole site: config, content, static files and the vendored theme,
+# rendered by the pinned hugo. Output lands in bazel-bin/site -- the same
+# tree `hugo` writes to public/.
+hugo_site(
+    name = "site",
+    config = "config.yaml",
+    content = glob(["content/**"]),
+    # Data files: the destinations and creator links the landing page loops
+    # over.
+    data = glob(
+        ["data/**"],
+        allow_empty = True,
+    ),
+    # Site-local layout overrides, merged over the theme's layouts/ by hugo.
+    # Empty right now: the gtag moved into the theme's `gtag` param and the
+    # MathJax leftovers are gone. The landing page's index.html lands here.
+    layouts = glob(
+        ["layouts/**"],
+        allow_empty = True,
+    ),
+    # The generated mark is appended to the source glob. rules_hugo passes a
+    # generated input through at its own output path, so a file produced in
+    # //static/logo lands at static/logo/ in the staged tree and is
+    # published at /logo/brand-logo.svg.
+    static = glob(["static/**"]) + [
+        "//static/logo:brand-logo",
+        "//static/logo:brand-logo-black",
+        "//static/logo:brand-logo-white",
+        "//static/logo:brand-mark",
+        "//static/logo:brand-mark-black",
+        "//static/logo:brand-mark-white",
+    ],
+    theme = "//third_party/rentaltheme",
+    visibility = ["//visibility:public"],
+)
+
+# Local preview: `bazel run //:serve` runs the downloaded hugo's dev server
+# over the staged site sources -- no host hugo needed.
+hugo_serve(
+    name = "serve",
+    dep = [":site"],
+)
+
+# `bazel run //:buildifier` formats all Bazel files in the tree.
+buildifier(
+    name = "buildifier",
+    exclude_patterns = ["./.git/*"],
+    lint_mode = "fix",
+    mode = "fix",
+)

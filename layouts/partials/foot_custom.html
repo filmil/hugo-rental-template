@@ -1,0 +1,17 @@
+{{/* Consent manager (PLACEHOLDER). Wire your own cookie-consent tool here so
+     the footer "Cookie Preferences" link (the theme's cookieLink param,
+     #cookie-preferences) opens its drawer. Below is the generic shape for a
+     drawer-style CMP; replace the script src and the show-drawer call with
+     your provider's, or remove this partial entirely if you don't use one. */}}
+{{ with .Site.Params.consentScript }}
+<script src="{{ . }}"></script>
+{{ end }}
+<script>
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a[href="#cookie-preferences"]');
+    if (!a) return;
+    e.preventDefault();
+    // TODO: open your consent manager's preferences drawer here, e.g.:
+    // if (window.YourCMP) { window.YourCMP.showPreferences(); }
+  });
+</script>

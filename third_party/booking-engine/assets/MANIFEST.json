@@ -1,0 +1,21 @@
+{
+  "logo": {
+    "file": "assets/logo.jpg",
+    "origin": "https://cdn.yourdomain.com/assets/logo.jpg",
+    "bytes": 0,
+    "sha256": "PLACEHOLDER_SHA256"
+  },
+  "favicon": {
+    "file": "assets/favicon.png",
+    "origin": "https://cdn.yourdomain.com/assets/favicon.png",
+    "bytes": 0,
+    "sha256": "PLACEHOLDER_SHA256"
+  },
+  "hero-background": {
+    "file": "assets/hero-background.jpg",
+    "origin": "https://cdn.yourdomain.com/assets/hero-background.jpg",
+    "bytes": 0,
+    "sha256": "PLACEHOLDER_SHA256",
+    "note": "Record the source URL and checksum of each exported asset here."
+  }
+}

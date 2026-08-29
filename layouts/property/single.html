@@ -1,0 +1,23 @@
+{{ define "main" }}
+{{/* A property landing page, a common pattern: hero photo,
+     specs, amenity chips, prose, gallery, booking CTA. Data comes from
+     front matter; images from static/img/<slug>/. */}}
+<div class="container">
+  {{ $img := printf "/img/%s" .Params.imgdir }}
+  <div class="prop-hero"><img src="{{ $img }}/{{ .Params.hero }}" alt="{{ .Title }}"></div>
+  <div class="prop-head">
+    <h1>{{ .Title }}</h1>
+    <span class="prop-specs">{{ .Params.guests }} guests · {{ .Params.bedrooms }} bedrooms · {{ .Params.bathrooms }} {{ if eq (int .Params.bathrooms) 1 }}bathroom{{ else }}bathrooms{{ end }}</span>
+  </div>
+  <div class="prop-amenities">
+    {{ range .Params.amenities }}<span>{{ . }}</span>{{ end }}
+  </div>
+  <div class="prose">
+    {{ .Content }}
+  </div>
+  <p class="prop-cta"><a class="btn" href="{{ .Params.listing }}">Check availability &amp; book</a></p>
+  <div class="prop-gallery">
+    {{ range .Params.gallery }}<img src="{{ $img }}/{{ . }}" alt="" loading="lazy">{{ end }}
+  </div>
+</div>
+{{ end }}

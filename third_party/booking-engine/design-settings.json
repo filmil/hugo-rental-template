@@ -1,0 +1,74 @@
+{
+  "brandColor": "#000000",
+  "middleColor": "#5975c9",
+  "darkColor": "#000000",
+  "headingsFont": "Poppins",
+  "headerColor": "#ffffff",
+  "footerColor": "#000000",
+  "footerTextColor": "#ffffff",
+  "textFont": "Poppins",
+  "isVolumetric": 0,
+  "isRounded": 1,
+  "mainNavigation": [
+    {
+      "name": "Home",
+      "slug": "home"
+    },
+    {
+      "name": "All listings",
+      "slug": "all-listings"
+    },
+    {
+      "name": "About us",
+      "slug": "about-us"
+    },
+    {
+      "name": "Contact us",
+      "slug": "contact-us"
+    },
+    {
+      "name": ""
+    },
+    {
+      "name": "",
+      "slug": ""
+    }
+  ],
+  "footerNavigation": [
+    {
+      "name": "Home",
+      "slug": "home"
+    },
+    {
+      "name": "Privacy policy",
+      "slug": "privacy-policy"
+    },
+    {
+      "name": "Terms & conditions",
+      "slug": "terms-and-conditions"
+    },
+    {
+      "name": "Contact us",
+      "slug": "contact-us"
+    },
+    {
+      "name": ""
+    },
+    {
+      "name": "",
+      "slug": ""
+    }
+  ],
+  "favicon": "https://cdn.yourdomain.com/assets/favicon.png",
+  "amenities": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "logo": "https://cdn.yourdomain.com/assets/logo.jpg",
+  "heroMimeType": "image/jpeg",
+  "isHeroDark": 0,
+  "headerTextColor": "#000000"
+}

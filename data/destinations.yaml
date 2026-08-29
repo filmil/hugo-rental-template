@@ -1,0 +1,18 @@
+# The destinations, in display order. `image` points at a card photo in
+# static/img/; `href` is where the destination card sends the visitor
+# (usually a filtered view on your booking site).
+- name: "Mountain Town, State"
+  meta: "Hot tub · game room · pets welcome"
+  href: "https://book.yourdomain.com/all-listings?category=000001"
+  image: "/img/mountain-lodge/card.jpg"
+  tags: ["Mountains", "Skiing"]
+- name: "Beach City, State"
+  meta: "Coast views · steps from the sand"
+  href: "https://book.yourdomain.com/all-listings?category=000002"
+  image: "/img/beach-condo/card.jpg"
+  tags: ["Coast", "Beach"]
+- name: "Northern City, Country"
+  meta: "Northern lights · sauna · ski storage"
+  href: "https://book.yourdomain.com/all-listings?category=000003"
+  image: "/img/aurora-house/card.jpg"
+  tags: ["Arctic", "Aurora"]

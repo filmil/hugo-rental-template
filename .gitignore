@@ -1,0 +1,12 @@
+# Anchored to the repository root, so that a directory named e.g.
+# static/bazel-something is not swept up by the bazel-* pattern.
+/bazel-*
+/.hugo_build.lock
+/MODULE.bazel.lock
+/public
+/resources
+/user.bazelrc
+
+# Python bytecode caches, created when scripts are imported as modules.
+__pycache__/
+*.pyc

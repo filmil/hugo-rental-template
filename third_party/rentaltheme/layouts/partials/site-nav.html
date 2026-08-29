@@ -1,0 +1,21 @@
+{{/* The booking site's header, replicated: white bar with the soft shadow,
+     not sticky; the logo anchor fills the bar height minus 10px vertical
+     padding; plain bold links separated by 4px dots; below 48rem the nav
+     collapses behind a hamburger (CSS-only checkbox toggle). */}}
+<header class="site-header">
+  <div class="container nav-row">
+    <a class="brand" href="{{ "/" | relURL }}">
+      {{ with .Site.Params.logo }}<img src="{{ . | relURL }}" alt="{{ $.Site.Title }}">{{ end }}
+      {{ if .Site.Params.brandTextA }}<span class="brand-word"><span class="b1">{{ .Site.Params.brandTextA }}</span>{{ .Site.Params.brandTextB }}</span>{{ else if not .Site.Params.logo }}<span class="brand-text">{{ .Site.Title }}</span>{{ end }}
+    </a>
+    <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
+    <label for="nav-toggle" class="nav-burger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </label>
+    <nav class="site-nav">
+      {{ range .Site.Menus.main }}
+      <a href="{{ .URL | relURL }}">{{ .Name }}</a>
+      {{ end }}
+    </nav>
+  </div>
+</header>
